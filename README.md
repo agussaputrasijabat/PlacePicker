@@ -2,7 +2,7 @@
 
 Place Picker is a simple cross-platform plugin which allows to pick a location and get location address from Google Maps with the help of Xamarin Essentials Geolocation & Geocoding.
 
-![Image](https://github.com/agussaputrasijabat/PlacePicker/blob/master/nuget/view.PNG)
+![Image](https://raw.githubusercontent.com/agussaputrasijabat/PlacePicker/master/nuget/view.PNG)
 
 - Location Entry shows the location address. (Cannot be edited)
 - **Confirm Location** -> returns the location response.

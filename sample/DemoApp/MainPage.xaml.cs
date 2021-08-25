@@ -30,7 +30,11 @@ namespace DemoApp
         public async void Handle_Clicked(object sender, EventArgs e)
         {
             LocationPicker.PinImage = "pin.png";
-            var place = await LocationPicker.SelectPlace();
+            var place = await LocationPicker.SelectPlace(new PickerConfig
+            {
+                InitialLocation = new Xamarin.Essentials.Location(0.533505, 101.447403)
+            });
+
             if (place?.Data != null)
             {
                 SelectedPlace = place.Data;

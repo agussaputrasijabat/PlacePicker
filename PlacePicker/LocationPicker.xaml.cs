@@ -79,7 +79,7 @@ namespace PlacePicker
             if (lastLocation != null)
             {
                 var lastPosition = new Position(lastLocation.Latitude, lastLocation.Longitude);
-                LocationMap.InitialCameraUpdate = CameraUpdateFactory.NewPositionZoom(lastPosition,15);
+                LocationMap.MoveToRegion(MapSpan.FromCenterAndRadius(lastPosition, Distance.FromMiles(0.1)), false);
             }
             else
             { 
