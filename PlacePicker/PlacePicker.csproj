@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <PackOnBuild>true</PackOnBuild>
     <PackageId>PlacePickerExt</PackageId>
-    <PackageVersion>1.0.0-beta</PackageVersion>
+    <PackageVersion>1.0.0-beta.1</PackageVersion>
     <Authors>Agus Saputra Sijabat</Authors>
     <Owners>Agus Saputra Sijabat</Owners>
     <PackageProjectUrl>https://github.com/agussaputrasijabat/PlacePicker</PackageProjectUrl>

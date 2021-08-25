@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -34,14 +33,7 @@ namespace PlacePicker
         {
             InitializeComponent();
 
-            if (config == null) config = new PickerConfig
-            {
-                ConfirmText = "Confirm Location",
-                CancelText = "Cancel",
-                ConfirmBackgroundColor = Color.FromHex("#1AA260"),
-                ConfirmTextColor = Color.White,
-                ButtonCornerRadius = 10
-            };
+            if (config == null) config = new PickerConfig();
 
             Place = new Place();
             LocationMap.UiSettings.ZoomGesturesEnabled = true;
