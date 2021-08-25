@@ -6,6 +6,9 @@
     <PackageId>PlacePickerExt</PackageId>
     <PackageVersion>1.0.0-beta</PackageVersion>
     <Authors>Agus Saputra Sijabat</Authors>
+    <Owners>Agus Saputra Sijabat</Owners>
+    <PackageProjectUrl>https://github.com/agussaputrasijabat/PlacePicker</PackageProjectUrl>
+    <Title>PlacePickerExt</Title>
   </PropertyGroup>
 
   <ItemGroup>
