@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using PlacePicker.Helpers;
 using PlacePicker.Models;
@@ -22,19 +23,41 @@ namespace PlacePicker
         private TaskCompletionSource<Place> _taskCompletionSource;
 
         public static Place Place;
-       
 
-        public LocationPicker()
+        public bool IsCancelled = false;
+
+        public PickerConfig Config { get; private set; }
+
+        public new event PropertyChangedEventHandler PropertyChanged;
+
+        public LocationPicker(PickerConfig config = null)
         {
             InitializeComponent();
+
+            if (config == null) config = new PickerConfig
+            {
+                ConfirmText = "Confirm Location",
+                CancelText = "Cancel",
+                ConfirmBackgroundColor = Color.FromHex("#1AA260"),
+                ConfirmTextColor = Color.White,
+                ButtonCornerRadius = 10
+            };
+
             Place = new Place();
             LocationMap.UiSettings.ZoomGesturesEnabled = true;
-            LocationMap.MyLocationEnabled = true;
-            LocationMap.UiSettings.MyLocationButtonEnabled = true;
             LocationMap.UiSettings.ScrollGesturesEnabled = true;
             pin.Source = PinImage;
-            UpdateCamera().ConfigureAwait(false);
             LocationMap.CameraIdled += LocationMap_CameraIdled;
+            BindingContext = this;
+
+            Config = config;
+            OnPropertyChanged(nameof(Config));
+        }
+
+        protected override bool OnBackButtonPressed()
+        {
+            Handle_CancelTapped(this, new EventArgs());
+            return true;
         }
 
         async private void LocationMap_CameraIdled(object sender, CameraIdledEventArgs e)
@@ -60,7 +83,7 @@ namespace PlacePicker
 
         async private Task UpdateCamera()
         {
-            var lastLocation = await Geolocation.GetLastKnownLocationAsync();
+            var lastLocation = Config.InitialLocation;
             if (lastLocation != null)
             {
                 var lastPosition = new Position(lastLocation.Latitude, lastLocation.Longitude);
@@ -89,12 +112,12 @@ namespace PlacePicker
         {
             if (_taskCompletionSource != null)
             {
+                IsCancelled = true;
                 _taskCompletionSource.SetResult(null);
                 _taskCompletionSource = null;
                 await Navigation.PopModalAsync();
             }
         }
-
         
         private Task<Place> GetPlace()
         {
@@ -102,29 +125,36 @@ namespace PlacePicker
             return _taskCompletionSource.Task;
         }
 
-        async public static Task<BaseModel<Place>> SelectPlace()
+        async public static Task<BaseModel<Place>> SelectPlace(PickerConfig config = null)
         {
+            await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
             var currentNav = Application.Current.MainPage.Navigation;
             if (currentNav != null)
             {
+                var status = await GetUserLocation.CheckPermissions();
                 var result = new BaseModel<Place>();
-                var placePicker = new LocationPicker();
-                var Status = await GetUserLocation.CheckPermissions();
-                if (Status == Status.Success)
+                var placePicker = new LocationPicker(config);
+                
+                if (status == Status.Success)
                 {
+                    placePicker.LocationMap.MyLocationEnabled = true;
+                    placePicker.LocationMap.UiSettings.MyLocationButtonEnabled = true;
+
                     if (currentNav.ModalStack.Where(x => x is LocationPicker).Count() == 0)
                     {
                         await currentNav.PushModalAsync(placePicker);
+                        await placePicker.UpdateCamera();
+
                         var selectedPlace = await placePicker.GetPlace();
                         result.Data = selectedPlace;
-                        result.Status = Status.Success;
+                        result.Status = !placePicker.IsCancelled ? Status.Success : Status.Cancelled;
                     }
                     else
                         return null;
                 }
                 else
                 {
-                    result.Status = Status;
+                    result.Status = status;
                 }
                 return result;
             }
@@ -132,6 +162,13 @@ namespace PlacePicker
             {
                 return null;
             }
+        }
+
+#pragma warning disable CS0114 // Member hides inherited member; missing override keyword
+        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+#pragma warning restore CS0114 // Member hides inherited member; missing override keyword
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

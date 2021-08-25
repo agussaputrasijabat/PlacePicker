@@ -2,8 +2,6 @@
 using System.Linq;
 using System.Threading.Tasks;
 using PlacePicker.Models;
-using Plugin.Permissions;
-using Plugin.Permissions.Abstractions;
 using Xamarin.Essentials;
 using Xamarin.Forms.Internals;
 
@@ -19,17 +17,12 @@ namespace PlacePicker.Helpers
             {
                 try
                 {
-                    var status = await CrossPermissions.Current.CheckPermissionStatusAsync(Permission.Location);
+                    var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
                     if (status != PermissionStatus.Granted)
                     {
-                        if(await CrossPermissions.Current.ShouldShowRequestPermissionRationaleAsync(Permission.Location))
-                        {
-                            result = Status.Failed;
-                        }
-                        var results = await CrossPermissions.Current.RequestPermissionsAsync(Permission.Location);
-                        if (results.ContainsKey(Permission.Location))
-                            status = results[Permission.Location];
+                        status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
                     }
+
                     if (status == PermissionStatus.Granted)
                     {
                         result = Status.Success;
@@ -56,6 +49,7 @@ namespace PlacePicker.Helpers
             {
                 result = Status.NoInternet;
             }
+
             return result;
         }
 

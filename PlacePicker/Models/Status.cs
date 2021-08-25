@@ -7,6 +7,7 @@ namespace PlacePicker.Models
     public enum Status
     {
         Success,
+        Cancelled,
         Failed,
         Denied,
         Disabled,
